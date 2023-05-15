@@ -69,6 +69,7 @@ def expand(node):
 
 def general_search(problem, queueing_function):  # function general-search(problem, QUEUEING-FUNCTION)
     nodes = [Node(problem, 0, 0)]  # nodes = MAKE-QUEUE(MAKE-NODE(problem.INITIAL-STATE))
+    start_time = time.time()
     while True:  # loop do
         if len(nodes) == 0:  # if EMPTY(nodes) then return "failure"
             return False
@@ -77,7 +78,8 @@ def general_search(problem, queueing_function):  # function general-search(probl
         node.print_puzzle()
         print("current depth = " + str(node.gn) + '\n')
         if node.is_goal():  # if problem.GOAL-TEST(node.STATE) succeeds then return node
-            return node
+            end_time = time.time()
+            return node, end_time - start_time
         nodes = queueing_function(nodes, expand(node))  # nodes = QUEUEING-FUNCTION(nodes, EXPAND(node,
         # problem.OPERATORS))
 
@@ -125,22 +127,48 @@ def manhattanDistanceHeuristic(nodes, expand_nodes):
         history.append(node.puzzle)
     return nodes
 
+def plot_runtimes(puzzle):
+    uniform_times = []
+    misplaced_times = []
+    manhattan_times = []
+
+    for i in range(10):
+        history.clear()
+        print("result of uniformCostSearch:")
+        uniform_search_result, uniform_search_time = general_search(puzzle, uniformCostSearch)
+        uniform_times.append(uniform_search_time)
+
+        history.clear()
+        print("\n\n----------------------------")
+        print("result of misplacedTileHeuristic:")
+        misplaced_search_result, misplaced_search_time = general_search(puzzle, misplacedTileHeuristic)
+        misplaced_times.append(misplaced_search_time)
+
+        history.clear()
+        print("\n\n----------------------------")
+        print("result of manhattanDistanceHeuristic:")
+        manhattan_search_result, manhattan_search_time = general_search(puzzle, manhattanDistanceHeuristic)
+        manhattan_times.append(manhattan_search_time)
+
+    plt.plot(uniform_times, label="Uniform Cost Search")
+    plt.plot(misplaced_times, label="Misplaced Tile Heuristic")
+    plt.plot(manhattan_times, label="Manhattan Distance Heuristic")
+    plt.xlabel("Search Count")
+    plt.ylabel("Runtime (s)")
+    plt.title("Runtime Comparison of Search Algorithms")
+    plt.legend()
+    plt.show()
 
 if __name__ == "__main__":
     # p = [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 0, 15]]
     # p = [[0, 7, 2], [4, 6, 1], [3, 5, 8]]
-    p = []
-    width = input("Enter the width of puzzle(e.g. type \"3 for a 3*n puzzle): ")
-    for i in range(0, int(width)):
-        p.append([int(s) for s in input("input the row " + str(i + 1) + ": ").split()])
-    print(p)
-    print("result of uniformCostSearch:")
-    general_search(p, uniformCostSearch)
-    print("\n\n----------------------------")
-    print("result of misplacedTileHeuristic:")
-    history.clear()
-    general_search(p, misplacedTileHeuristic)
-    print("\n\n----------------------------")
-    print("result of manhattanDistanceHeuristic:")
-    history.clear()
-    general_search(p, manhattanDistanceHeuristic)
+    # p = [[1, 2 ,3], [5, 0, 6], [4, 7, 8]]
+    # p = [[1, 3, 6], [5, 0, 2], [4, 7, 8]]
+    p = [[1, 3, 6], [5, 0, 7], [4, 8, 2]]   # Depth 12
+    p = [[1, 6, 7], [5, 0, 3], [4, 8, 2]]   # Depth 16
+    # p = []
+    # width = input("Enter the width of puzzle(e.g. type \"3 for a 3*n puzzle): ")
+    # for i in range(0, int(width)):
+    #     p.append([int(s) for s in input("input the row " + str(i + 1) + ": ").split()])
+
+    plot_runtimes(p)
