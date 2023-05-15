@@ -1,4 +1,6 @@
 from copy import deepcopy
+import time
+import matplotlib.pyplot as plt
 
 history = []
 
@@ -70,12 +72,18 @@ def general_search(problem, queueing_function):  # function general-search(probl
     while True:  # loop do
         if len(nodes) == 0:  # if EMPTY(nodes) then return "failure"
             return False
+        nodes.sort(reverse=True, key=my_compare)
         node = nodes.pop()  # node = REMOVE-FRONT(nodes)
         node.print_puzzle()
+        print("current depth = " + str(node.gn) + '\n')
         if node.is_goal():  # if problem.GOAL-TEST(node.STATE) succeeds then return node
             return node
         nodes = queueing_function(nodes, expand(node))  # nodes = QUEUEING-FUNCTION(nodes, EXPAND(node,
         # problem.OPERATORS))
+
+
+def my_compare(node):
+    return node.get_fn()
 
 
 def uniformCostSearch(nodes, expand_nodes):
@@ -112,7 +120,6 @@ def manhattanDistanceHeuristic(nodes, expand_nodes):
                 if node.puzzle[i][j] == 0:
                     continue
                 goal_i, goal_j = divmod(node.puzzle[i][j] - 1, node.width)
-                print(abs(goal_i - i) + abs(goal_j - j))
                 node.hn += abs(goal_i - i) + abs(goal_j - j)
         nodes.append(node)
         history.append(node.puzzle)
@@ -121,5 +128,19 @@ def manhattanDistanceHeuristic(nodes, expand_nodes):
 
 if __name__ == "__main__":
     # p = [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 0, 15]]
-    p = [[1, 2, 3], [4, 5, 6], [7, 0, 8]]
+    # p = [[0, 7, 2], [4, 6, 1], [3, 5, 8]]
+    p = []
+    width = input("Enter the width of puzzle(e.g. type \"3 for a 3*n puzzle): ")
+    for i in range(0, int(width)):
+        p.append([int(s) for s in input("input the row " + str(i + 1) + ": ").split()])
+    print(p)
+    print("result of uniformCostSearch:")
+    general_search(p, uniformCostSearch)
+    print("\n\n----------------------------")
+    print("result of misplacedTileHeuristic:")
+    history.clear()
+    general_search(p, misplacedTileHeuristic)
+    print("\n\n----------------------------")
+    print("result of manhattanDistanceHeuristic:")
+    history.clear()
     general_search(p, manhattanDistanceHeuristic)
