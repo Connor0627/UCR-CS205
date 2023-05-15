@@ -132,7 +132,7 @@ def plot_runtimes(puzzle):
     misplaced_times = []
     manhattan_times = []
 
-    for i in range(10):
+    for i in range(2):
         history.clear()
         print("result of uniformCostSearch:")
         uniform_search_result, uniform_search_time = general_search(puzzle, uniformCostSearch)
@@ -161,14 +161,14 @@ def plot_runtimes(puzzle):
 
 if __name__ == "__main__":
     # p = [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 0, 15]]
-    # p = [[0, 7, 2], [4, 6, 1], [3, 5, 8]]
-    # p = [[1, 2 ,3], [5, 0, 6], [4, 7, 8]]
-    # p = [[1, 3, 6], [5, 0, 2], [4, 7, 8]]
-    p = [[1, 3, 6], [5, 0, 7], [4, 8, 2]]   # Depth 12
-    p = [[1, 6, 7], [5, 0, 3], [4, 8, 2]]   # Depth 16
-    # p = []
-    # width = input("Enter the width of puzzle(e.g. type \"3 for a 3*n puzzle): ")
-    # for i in range(0, int(width)):
-    #     p.append([int(s) for s in input("input the row " + str(i + 1) + ": ").split()])
+    # p = [[1, 2 ,3], [5, 0, 6], [4, 7, 8]] # Depth 4
+    # p = [[1, 3, 6], [5, 0, 2], [4, 7, 8]]   # Depth 8
+    # p = [[1, 3, 6], [5, 0, 7], [4, 8, 2]]   # Depth 12
+    # p = [[1, 6, 7], [5, 0, 3], [4, 8, 2]]   # Depth 16
+    # p = [[0, 7, 2], [4, 6, 1], [3, 5, 8]] # Depth 24
+    p = []
+    width = input("Enter the width of puzzle(e.g. type \"3 for a 3*n puzzle): ")
+    for i in range(0, int(width)):
+        p.append([int(s) for s in input("input the row " + str(i + 1) + ": ").split()])
 
     plot_runtimes(p)
