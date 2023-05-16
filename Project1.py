@@ -170,12 +170,12 @@ if __name__ == "__main__":
     p16 = [[1, 6, 7], [5, 0, 3], [4, 8, 2]]  # Depth 16
     p20 = [[7, 1, 2], [4, 8, 5], [6, 3, 0]]  # Depth 20
     p24 = [[0, 7, 2], [4, 6, 1], [3, 5, 8]]  # Depth 24
-    # p = []
-    # width = input("Enter the width of puzzle(e.g. type \"3 for a 3*n puzzle): ")
-    # for i in range(0, int(width)):
-    #     p.append([int(s) for s in input("input the row " + str(i + 1) + ": ").split()])
-    #
-    p = pp
+    p = []
+    width = input("Enter the width of puzzle(e.g. type \"3 for a 3*n puzzle): ")
+    for i in range(0, int(width)):
+        p.append([int(s) for s in input("input the row " + str(i + 1) + ": ").split()])
+
+    # p = pp
 
     print("result of uniformCostSearch:")
     uniform_search_result, uniform_search_time, uniform_search_count = general_search(p, uniformCostSearch)
