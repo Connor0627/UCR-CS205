@@ -2,6 +2,7 @@ import numpy as np
 from copy import deepcopy
 import sys
 
+
 def calculate_accuracy(dataset, selected_features):
     if not selected_features:
         selected_features = list(range(1, len(dataset[0])))
@@ -59,12 +60,37 @@ def forward_search(dataset):
 
 
 def backward_search(dataset):
-    a = 0
+    selected_features = list(range(1, len(dataset[0])))
+    best_subset = []
+    best_result = 0.0
+    for _ in range(len(dataset[0]) - 1):
+        best_feature = selected_features[0]
+        best_accuracy = 0.0
+        temp_features = deepcopy(selected_features)
+        for feature in temp_features:
+            selected_features.remove(feature)
+            accuracy = calculate_accuracy(dataset, selected_features)
+            print("Using feature(s){" + str(selected_features) + "} accuracy is " + str(
+                "{:.1f}".format(accuracy)) + "%")
+            if accuracy > best_accuracy:
+                best_accuracy = accuracy
+                best_feature = feature
+            selected_features.append(feature)
+        selected_features.remove(best_feature)
+        if best_accuracy > best_result:
+            best_result = best_accuracy
+            best_subset = deepcopy(selected_features)
+        else:
+            print("(Warning, Accuracy has decreased! Continuing search in case of local maxima)")
+        print("Feature set " + str(selected_features) + " was best, accuracy is " + str(
+            "{:.1f}".format(best_accuracy)) + "%\n")
+    print("Finished! The best features subset is " + str(best_subset) + ", its accuracy is " + str(
+        "{:.1f}".format(best_result)) + "%")
 
 
 print("Welcome to Jiang Zhu and Xiang Qian's Feature Selection Algorithm.")
-# filePath = input("Type in the name of the file to test:")  # /Users/connor/Desktop/data_sets/CS170_small_Data__20.txt
-filePath = "/Users/connor/Desktop/data_sets/CS170_large_Data__33.txt"
+filePath = input("Type in the name of the file to test:")
+# filePath = "/Users/connor/Desktop/data_sets/CS170_small_Data__33.txt"
 
 with open(filePath, 'r') as file:
     lines = file.readlines()
