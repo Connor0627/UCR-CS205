@@ -1,7 +1,7 @@
 import numpy as np
 from copy import deepcopy
 import sys
-
+import time
 
 def calculate_accuracy(dataset, selected_features):
     if not selected_features:
@@ -30,6 +30,7 @@ def calculate_accuracy(dataset, selected_features):
 
 
 def forward_search(dataset):
+    start_time = time.time()
     selected_features = []
     best_subset = []
     best_result = 0.0
@@ -57,9 +58,11 @@ def forward_search(dataset):
             "{:.1f}".format(best_accuracy)) + "%\n")
     print("Finished! The best features subset is " + str(best_subset) + ", its accuracy is " + str(
         "{:.1f}".format(best_result)) + "%")
-
+    end_time = time.time()
+    print("RunTime:" + str("{:.1f}".format(end_time - start_time)))
 
 def backward_search(dataset):
+    start_time = time.time()
     selected_features = list(range(1, len(dataset[0])))
     best_subset = []
     best_result = 0.0
@@ -86,6 +89,8 @@ def backward_search(dataset):
             "{:.1f}".format(best_accuracy)) + "%\n")
     print("Finished! The best features subset is " + str(best_subset) + ", its accuracy is " + str(
         "{:.1f}".format(best_result)) + "%")
+    end_time = time.time()
+    print("RunTime:" + str("{:.1f}".format(end_time - start_time)))
 
 
 print("Welcome to Jiang Zhu and Xiang Qian's Feature Selection Algorithm.")
