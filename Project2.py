@@ -1,40 +1,26 @@
 import numpy as np
-import csv
-import pandas as pd
+from copy import deepcopy
+import sys
 
-
-def calculate_distance(instance1, instance2):
-    distance = 0.0
-    for i in range(len(instance1)):
-        distance += (float(instance1[i]) - float(instance2[i])) ** 2
-    distance = distance ** 0.5
-    return distance
-
-
-def calculate_accuracy(dataset):
+def calculate_accuracy(dataset, selected_features):
+    if not selected_features:
+        selected_features = list(range(1, len(dataset[0])))
     num_instances = len(dataset)
     correct_predictions = 0
 
     for instance in dataset:
-        check_instance = instance[1:]  # features of current instance
-        true_label = instance[0]  # label of current instance
-
-        distances = []  # store distances to other instances
-        labels = []  # store labels of other instances
-
+        minDistance = sys.maxsize
+        index = 0
         for other_instance in dataset:
-            if instance == other_instance:
-                continue
-            other_label = other_instance[0]
-            other_features = other_instance[1:]
-            distance = calculate_distance(check_instance, other_features)
-            distances.append(distance)
-            labels.append(other_label)
+            if not instance == other_instance:
+                distance = 0.0
+                for i in selected_features:
+                    distance += (float(instance[i]) - float(other_instance[i])) ** 2
+                if distance < minDistance:
+                    minDistance = distance
+                    index = dataset.index(other_instance)
 
-        nearest_neighbor_index = np.argmin(distances)  # index of nn
-        predicted_label = labels[nearest_neighbor_index]  # label of nn
-
-        if predicted_label == true_label:
+        if instance[0] == dataset[index][0]:
             correct_predictions += 1
 
     accuracy = (correct_predictions / num_instances) * 100
@@ -43,54 +29,43 @@ def calculate_accuracy(dataset):
 
 
 def forward_search(dataset):
-    num_features = len(dataset[0]) - 1
-    selected_features = []  # 存储已选择的特征
-    best_accuracy = 0.0
+    selected_features = []
+    best_subset = []
+    best_result = 0.0
 
-    for _ in range(num_features):
+    for _ in range(len(dataset[0]) - 1):
         best_feature = None
-        for feature in range(1, num_features + 1):
+        best_accuracy = 0.0
+        for feature in range(1, len(dataset[0])):
             if feature not in selected_features:
                 selected_features.append(feature)
-                accuracy = calculate_accuracy(dataset)
+                accuracy = calculate_accuracy(dataset, selected_features)
+                print("Using feature(s){" + str(selected_features) + "} accuracy is " + str(
+                    "{:.1f}".format(accuracy)) + "%")
                 if accuracy > best_accuracy:
                     best_accuracy = accuracy
                     best_feature = feature
                 selected_features.remove(feature)
-
-        if best_feature is not None:
-            selected_features.append(best_feature)
+        selected_features.append(best_feature)
+        if best_accuracy > best_result:
+            best_result = best_accuracy
+            best_subset = deepcopy(selected_features)
         else:
-            break
-
-    return selected_features, best_accuracy
+            print("(Warning, Accuracy has decreased! Continuing search in case of local maxima)")
+        print("Feature set " + str(selected_features) + " was best, accuracy is " + str(
+            "{:.1f}".format(best_accuracy)) + "%\n")
+    print("Finished! The best features subset is " + str(best_subset) + ", its accuracy is " + str(
+        "{:.1f}".format(best_result)) + "%")
 
 
 def backward_search(dataset):
-    num_features = len(dataset[0]) - 1
-    selected_features = list(range(1, num_features + 1))  # 存储已选择的特征
-    best_accuracy = calculate_accuracy(dataset)
+    a = 0
 
-    while len(selected_features) > 0:
-        worst_feature = None
-        for feature in selected_features:
-            selected_features.remove(feature)
-            accuracy = calculate_accuracy(dataset)
-            if accuracy > best_accuracy:
-                best_accuracy = accuracy
-            else:
-                worst_feature = feature
-            selected_features.append(feature)
 
-        if worst_feature is not None:
-            selected_features.remove(worst_feature)
-        else:
-            break
+print("Welcome to Jiang Zhu and Xiang Qian's Feature Selection Algorithm.")
+# filePath = input("Type in the name of the file to test:")  # /Users/connor/Desktop/data_sets/CS170_small_Data__20.txt
+filePath = "/Users/connor/Desktop/data_sets/CS170_large_Data__33.txt"
 
-    return selected_features, best_accuracy
-
-print("Welcome to Jiang Zhu and Xiang Qian's Feature Selection Algorithm." )
-filePath = input("Type in the name of the file to test:")  # /Users/connor/Desktop/data_sets/CS170_small_Data__20.txt
 with open(filePath, 'r') as file:
     lines = file.readlines()
 
@@ -98,22 +73,20 @@ data = []
 for line in lines:
     line = line.strip()
     row = line.split()
-    print(row)
     data.append(row)
 
-print(data)
-
 print("This dataset has " + str(len(data[0]) - 1) + " features (not including the class attribute, with " + str(
-        len(data)) + " instances.")
-accuracyInit = calculate_accuracy(data)
+    len(data)) + " instances.")
+accuracyInit = calculate_accuracy(data, [])
 print("Running nearest neighbor with all " + str(
-        len(data[0]) - 1) + " features, using \"leave one out\" evaluation, accuracy is " + str(accuracyInit * 100) + "%.\n")
+    len(data[0]) - 1) + " features, using \"leave one out\" evaluation, we get an accuracy of " + str(
+    "{:.1f}".format(accuracyInit)) + "%.\n")
 
+print("Type the number of the algorithm you want to run.")
+print("(1) Forward Selection.       (2) Backward Elimination")
 choice = input()
+print("Beginning search.")
 if choice == '1':
-    forward_selected_features, forward_accuracy = forward_search(data)
+    forward_search(data)
 elif choice == '2':
-    backward_selected_features, backward_accuracy = backward_search(data)
-
-forward_selected_features, forward_accuracy = forward_search(data)
-backward_selected_features, backward_accuracy = backward_search(data)
+    backward_search(data)
