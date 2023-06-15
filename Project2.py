@@ -1,7 +1,9 @@
-import numpy as np
+import pandas as pd
 from copy import deepcopy
 import sys
 import time
+import numpy as np
+from sklearn.preprocessing import StandardScaler
 
 def calculate_accuracy(dataset, selected_features):
     if not selected_features:
@@ -56,6 +58,11 @@ def forward_search(dataset):
             print("(Warning, Accuracy has decreased! Continuing search in case of local maxima)")
         print("Feature set " + str(selected_features) + " was best, accuracy is " + str(
             "{:.1f}".format(best_accuracy)) + "%\n")
+        # While the file is Xlarge
+        # if best_result > 95.0:
+        #     print("Reach the threshold, abandon!")
+        #     break
+
     print("Finished! The best features subset is " + str(best_subset) + ", its accuracy is " + str(
         "{:.1f}".format(best_result)) + "%")
     end_time = time.time()
@@ -93,9 +100,8 @@ def backward_search(dataset):
     print("RunTime:" + str("{:.1f}".format(end_time - start_time)))
 
 
-print("Welcome to Jiang Zhu and Xiang Qian's Feature Selection Algorithm.")
+print("Welcome to Jiang Zhu and Qian Xiang's Feature Selection Algorithm.")
 filePath = input("Type in the name of the file to test:")
-# filePath = "/Users/connor/Desktop/data_sets/CS170_small_Data__33.txt"
 
 with open(filePath, 'r') as file:
     lines = file.readlines()
@@ -105,6 +111,16 @@ for line in lines:
     line = line.strip()
     row = line.split()
     data.append(row)
+
+# real word
+# data = pd.read_csv('/Users/connor/Desktop/data.csv')
+# data = data.drop(['id', 'Unnamed: 32'], axis=1)
+# data['diagnosis'] = data['diagnosis'].map({'M': 1, 'B': 0})
+# scaler = StandardScaler()
+# X = scaler.fit_transform(data.drop('diagnosis', axis=1))
+# data = np.column_stack((data['diagnosis'].values, X))
+# data = data.tolist()
+
 
 print("This dataset has " + str(len(data[0]) - 1) + " features (not including the class attribute, with " + str(
     len(data)) + " instances.")
